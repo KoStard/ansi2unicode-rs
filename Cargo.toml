@@ -1,5 +1,5 @@
 [package]
-name = "arm_ansi_to_unicode_back_end"
+name = "ansi2unicode"
 version = "0.1.0"
 authors = ["KoStard <rub099999720@gmail.com>"]
 edition = "2018"
