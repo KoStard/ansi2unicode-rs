@@ -2,8 +2,8 @@ use super::text_translator::TextTranslator;
 use ropey::Rope;
 use std::fs::File;
 use std::io;
-use std::path::Path;
 use std::io::{Read, Write};
+use std::path::Path;
 
 pub struct TXTTranslator<'a> {
     path: &'a Path,
@@ -23,7 +23,7 @@ impl<'a> TXTTranslator<'a> {
             let line = f.line(i);
             let converted = translator.translate_from_ropey_chars(line.chars());
             let l = line.len_chars();
-            f.remove(pos..pos + line.len_chars());
+            f.remove(pos..pos + l);
             f.insert(pos, converted.as_str());
             pos += l;
         }
