@@ -5,16 +5,16 @@ use std::io::{Read, Write};
 use std::path::{Path, PathBuf};
 use zip::{ZipArchive, ZipWriter};
 
-pub struct DocXTranslator<'a> {
+pub struct PPTXTranslator<'a> {
     path: &'a Path,
     output_path: PathBuf,
 }
 
-impl<'a> DocXTranslator<'a> {
+impl<'a> PPTXTranslator<'a> {
     pub fn new(path: &'a str, output_path: &'a str) -> Self {
         let p = Path::new(path);
         let output = PathBuf::from(output_path);
-        DocXTranslator {
+        PPTXTranslator {
             path: p,
             output_path: output,
         }
@@ -22,14 +22,13 @@ impl<'a> DocXTranslator<'a> {
     pub fn translate(&self) -> io::Result<()> {
         let f = File::open(self.path)?;
         let mut archive = ZipArchive::new(f).unwrap();
-        println!("{:?}", self.output_path.as_os_str());
         let mut output_file = File::create(&self.output_path)?;
         let mut output_archive = ZipWriter::new(output_file);
 
         for i in 0..archive.len() {
             let mut file = archive.by_index(i)?;
             match file.name() {
-                "word/document.xml" => {
+                f if f.find("ppt/slides/slide").is_some() => {
                     let mut buff = String::new();
                     file.read_to_string(&mut buff);
                     let translator = TextTranslator::new();
@@ -58,12 +57,12 @@ impl<'a> DocXTranslator<'a> {
 
 #[cfg(test)]
 mod text_translation_tests {
-    use super::DocXTranslator;
+    use super::PPTXTranslator;
 
     // Test with your files
     //    #[test]
-    //    fn test_docx() {
-    //        let t = DocXTranslator::new("");
-    //        assert!(t.translate().is_ok());
+    //    fn test_pptx() {
+    //        let translator = PPTXTranslator::new("", "");
+    //        translator.translate();
     //    }
 }
