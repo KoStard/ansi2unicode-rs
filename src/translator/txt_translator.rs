@@ -33,7 +33,7 @@ impl<'a> TXTTranslator<'a> {
     pub fn translate(&self) -> io::Result<()> {
         let mut f = File::open(&self.path)?;
         let mut s = String::new();
-        f.read_to_string(&mut s);
+        f.read_to_string(&mut s)?;
         let translator = TextTranslator::new();
         let converted = translator.translate(&s);
         let mut buff = io::BufWriter::new(File::create(&self.path)?);

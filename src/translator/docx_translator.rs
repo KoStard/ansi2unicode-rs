@@ -23,7 +23,7 @@ impl<'a> DocXTranslator<'a> {
         let f = File::open(self.path)?;
         let mut archive = ZipArchive::new(f).unwrap();
         println!("{:?}", self.output_path.as_os_str());
-        let mut output_file = File::create(&self.output_path)?;
+        let output_file = File::create(&self.output_path)?;
         let mut output_archive = ZipWriter::new(output_file);
 
         for i in 0..archive.len() {
@@ -31,26 +31,26 @@ impl<'a> DocXTranslator<'a> {
             match file.name() {
                 "word/document.xml" => {
                     let mut buff = String::new();
-                    file.read_to_string(&mut buff);
+                    file.read_to_string(&mut buff)?;
                     let translator = TextTranslator::new();
                     let converted = translator.translate(&buff);
                     let options =
                         zip::write::FileOptions::default().compression_method(file.compression());
-                    output_archive.start_file(file.name(), options);
-                    output_archive.write(converted.as_bytes());
+                    output_archive.start_file(file.name(), options)?;
+                    output_archive.write(converted.as_bytes())?;
                 }
                 _ => {
                     let mut buffer = Vec::with_capacity(file.size() as usize);
                     //                    file.read_exact(&mut buffer);
-                    file.read_to_end(&mut buffer);
+                    file.read_to_end(&mut buffer)?;
                     let options =
                         zip::write::FileOptions::default().compression_method(file.compression());
-                    output_archive.start_file(file.name(), options);
-                    output_archive.write(&buffer);
+                    output_archive.start_file(file.name(), options)?;
+                    output_archive.write(&buffer)?;
                 }
             }
         }
-        output_archive.finish();
+        output_archive.finish()?;
 
         Ok(())
     }
