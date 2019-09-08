@@ -23,7 +23,7 @@ impl Translator {
         translator.translate()
     }
 
-    pub fn translate_docx_from_stream<R: io::Read+io::Seek>(reader: &mut R) -> io::Result<String> {
+    pub fn translate_docx_from_stream<R: io::Read+io::Seek>(reader: &mut R) -> io::Result<Vec<u8>> {
         translator::docx_translator::DocXTranslator::from_stream(reader)
     }
 
