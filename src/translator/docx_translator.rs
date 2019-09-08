@@ -1,7 +1,7 @@
 use super::text_translator::TextTranslator;
 use std::fs::File;
 use std::io;
-use std::io::{Cursor, Read, Write};
+use std::io::{Cursor, Read, Write, Seek};
 use std::path::{Path, PathBuf};
 use zip::{ZipArchive, ZipWriter};
 
@@ -62,7 +62,7 @@ impl<'a> DocXTranslator<'a> {
 
         Ok(())
     }
-    pub fn from_stream<R: io::Read+io::Seek>(reader: &mut R) -> io::Result<Vec<u8>> {
+        pub fn from_stream<R: io::Read+io::Seek>(reader: &mut R) -> io::Result<Vec<u8>> {
         let mut archive = ZipArchive::new(reader)?;
         let mut mem = Cursor::new(Vec::new());
         {
@@ -71,7 +71,8 @@ impl<'a> DocXTranslator<'a> {
             output_archive.finish()?;
         }
         let mut v = Vec::new();
-        mem.read_to_end(&mut v);
+        mem.set_position(0);
+        mem.read_to_end(&mut v)?;
         Ok(v)
     }
 }
@@ -79,6 +80,8 @@ impl<'a> DocXTranslator<'a> {
 #[cfg(test)]
 mod text_translation_tests {
     use super::DocXTranslator;
+    use super::File;
+    use std::io::{Read, Cursor};
 
     // Test with your files
     //    #[test]

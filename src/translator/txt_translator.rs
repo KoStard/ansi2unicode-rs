@@ -26,14 +26,15 @@ impl<'a> TXTTranslator<'a> {
         let mut buff = io::BufWriter::new(File::create(&self.path)?);
         Self::convert_file(&mut f, &mut buff)
     }
-    pub fn from_stream<R: io::Read+io::Seek>(reader: &mut R) -> io::Result<String> {
+    pub fn from_stream<R: io::Read+io::Seek>(reader: &mut R) -> io::Result<Vec<u8>> {
         let mut mem = Cursor::new(Vec::new());
         {
             Self::convert_file(reader, &mut mem)?;
         }
-        let mut buff = String::new();
-        mem.read_to_string(&mut buff)?;
-        Ok(buff)
+        let mut v = Vec::new();
+        mem.set_position(0);
+        mem.read_to_end(&mut v)?;
+        Ok(v)
     }
 }
 

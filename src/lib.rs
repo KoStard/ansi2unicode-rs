@@ -14,7 +14,7 @@ impl Translator {
         translator.translate()
     }
 
-    pub fn translate_txt_from_stream<R: io::Read+io::Seek>(reader: &mut R) -> io::Result<String> {
+    pub fn translate_txt_from_stream<R: io::Read+io::Seek>(reader: &mut R) -> io::Result<Vec<u8>> {
         translator::txt_translator::TXTTranslator::from_stream(reader)
     }
 
@@ -32,7 +32,7 @@ impl Translator {
         translator.translate()
     }
 
-    pub fn translate_pptx_from_stream<R: io::Read+io::Seek>(reader: &mut R) -> io::Result<String> {
+    pub fn translate_pptx_from_stream<R: io::Read+io::Seek>(reader: &mut R) -> io::Result<Vec<u8>> {
         translator::pptx_translator::PPTXTranslator::from_stream(reader)
     }
 }

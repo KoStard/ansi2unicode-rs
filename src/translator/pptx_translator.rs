@@ -63,7 +63,7 @@ impl<'a> PPTXTranslator<'a> {
 
         Ok(())
     }
-    pub fn from_stream<R: io::Read+io::Seek>(reader: &mut R) -> io::Result<String> {
+    pub fn from_stream<R: io::Read+io::Seek>(reader: &mut R) -> io::Result<Vec<u8>> {
         let mut archive = ZipArchive::new(reader)?;
         let mut mem = Cursor::new(Vec::new());
         {
@@ -71,9 +71,10 @@ impl<'a> PPTXTranslator<'a> {
             Self::convert_archive(&mut archive, &mut output_archive)?;
             output_archive.finish()?;
         }
-        let mut buff = String::new();
-        mem.read_to_string(&mut buff)?;
-        Ok(buff)
+        let mut v = Vec::new();
+        mem.set_position(0);
+        mem.read_to_end(&mut v)?;
+        Ok(v)
     }
 }
 
