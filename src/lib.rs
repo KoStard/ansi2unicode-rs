@@ -1,7 +1,7 @@
 mod translator;
 use std::io;
 
-struct Translator;
+pub struct Translator;
 
 impl Translator {
     pub fn translate_text(text: &str) -> String {
