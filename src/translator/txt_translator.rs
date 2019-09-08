@@ -1,7 +1,7 @@
 use super::text_translator::TextTranslator;
 use std::fs::File;
 use std::io;
-use std::io::{Read, Write};
+use std::io::{Cursor, Read, Write};
 use std::path::Path;
 
 pub struct TXTTranslator<'a> {
@@ -14,14 +14,26 @@ impl<'a> TXTTranslator<'a> {
             path: Path::new(path),
         }
     }
-    pub fn translate(&self) -> io::Result<()> {
-        let mut f = File::open(&self.path)?;
+    fn convert_file<A: Read + io::Seek, B: Write + io::Seek>(input: &mut A, output: &mut B) -> io::Result<()>{
         let mut s = String::new();
-        f.read_to_string(&mut s)?;
+        input.read_to_string(&mut s)?;
         let translator = TextTranslator::new();
         let converted = translator.translate(&s);
+        output.write_all(converted.as_bytes())
+    }
+    pub fn translate(&self) -> io::Result<()> {
+        let mut f = File::open(&self.path)?;
         let mut buff = io::BufWriter::new(File::create(&self.path)?);
-        buff.write_all(converted.as_bytes())
+        Self::convert_file(&mut f, &mut buff)
+    }
+    pub fn from_stream<R: io::Read+io::Seek>(reader: &mut R) -> io::Result<String> {
+        let mut mem = Cursor::new(Vec::new());
+        {
+            Self::convert_file(reader, &mut mem)?;
+        }
+        let mut buff = String::new();
+        mem.read_to_string(&mut buff)?;
+        Ok(buff)
     }
 }
 

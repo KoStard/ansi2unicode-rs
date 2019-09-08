@@ -1,7 +1,7 @@
 use super::text_translator::TextTranslator;
 use std::fs::File;
 use std::io;
-use std::io::{Read, Write};
+use std::io::{Cursor, Read, Write};
 use std::path::{Path, PathBuf};
 use zip::{ZipArchive, ZipWriter};
 
@@ -19,12 +19,11 @@ impl<'a> PPTXTranslator<'a> {
             output_path: output,
         }
     }
-    pub fn translate(&self) -> io::Result<()> {
-        let f = File::open(self.path)?;
-        let mut archive = ZipArchive::new(f).unwrap();
-        let output_file = File::create(&self.output_path)?;
-        let mut output_archive = ZipWriter::new(output_file);
 
+    fn convert_archive<A: Read + io::Seek, B: Write + io::Seek>(
+        archive: &mut ZipArchive<A>,
+        output_archive: &mut ZipWriter<B>,
+    ) -> io::Result<()> {
         for i in 0..archive.len() {
             let mut file = archive.by_index(i)?;
             match file.name() {
@@ -49,9 +48,32 @@ impl<'a> PPTXTranslator<'a> {
                 }
             }
         }
+        Ok(())
+    }
+
+    pub fn translate(&self) -> io::Result<()> {
+        let f = File::open(self.path)?;
+        let mut archive = ZipArchive::new(f).unwrap();
+        let output_file = File::create(&self.output_path)?;
+        let mut output_archive = ZipWriter::new(output_file);
+
+        Self::convert_archive(&mut archive, &mut output_archive)?;
+
         output_archive.finish()?;
 
         Ok(())
+    }
+    pub fn from_stream<R: io::Read+io::Seek>(reader: &mut R) -> io::Result<String> {
+        let mut archive = ZipArchive::new(reader)?;
+        let mut mem = Cursor::new(Vec::new());
+        {
+            let mut output_archive = ZipWriter::new(&mut mem);
+            Self::convert_archive(&mut archive, &mut output_archive)?;
+            output_archive.finish()?;
+        }
+        let mut buff = String::new();
+        mem.read_to_string(&mut buff)?;
+        Ok(buff)
     }
 }
 
