@@ -109,7 +109,7 @@ impl TextTranslator {
         .iter()
         .cloned()
         .collect();
-        inp.map(|c| if map.contains_key(&c) { map.get(&c).unwrap().clone() } else { c })
+        inp.map(|c| *map.get(&c).unwrap_or(&c))
             .collect()
     }
 }
