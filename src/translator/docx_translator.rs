@@ -34,7 +34,7 @@ impl<'a> DocXTranslator<'a> {
                     let options =
                         zip::write::FileOptions::default().compression_method(file.compression());
                     output_archive.start_file(file.name(), options)?;
-                    output_archive.write(converted.as_bytes())?;
+                    output_archive.write_all(converted.as_bytes())?;
                 }
                 _ => {
                     let mut buffer = Vec::with_capacity(file.size() as usize);
@@ -43,7 +43,7 @@ impl<'a> DocXTranslator<'a> {
                     let options =
                         zip::write::FileOptions::default().compression_method(file.compression());
                     output_archive.start_file(file.name(), options)?;
-                    output_archive.write(&buffer)?;
+                    output_archive.write_all(&buffer)?;
                 }
             }
         }
@@ -56,13 +56,13 @@ impl<'a> DocXTranslator<'a> {
         let output_file = File::create(&self.output_path)?;
         let mut output_archive = ZipWriter::new(output_file);
 
-        Self::convert_archive(&mut archive, &mut output_archive);
+        Self::convert_archive(&mut archive, &mut output_archive)?;
 
         output_archive.finish()?;
 
         Ok(())
     }
-        pub fn from_stream<R: io::Read+io::Seek>(reader: &mut R) -> io::Result<Vec<u8>> {
+    pub fn from_stream<R: io::Read+io::Seek>(reader: &mut R) -> io::Result<Vec<u8>> {
         let mut archive = ZipArchive::new(reader)?;
         let mut mem = Cursor::new(Vec::new());
         {
@@ -84,9 +84,9 @@ mod text_translation_tests {
     use std::io::{Read, Cursor};
 
     // Test with your files
-    //    #[test]
-    //    fn test_docx() {
-    //        let t = DocXTranslator::new("");
-    //        assert!(t.translate().is_ok());
-    //    }
+   #[test]
+   fn test_docx() {
+       let t = DocXTranslator::new("/Users/rubenkostandyan/Downloads/Pulmanology1-converted.docx", "/Users/rubenkostandyan/Downloads/Pulmanology1-converted-translated.docx");
+       assert!(t.translate().is_ok());
+   }
 }

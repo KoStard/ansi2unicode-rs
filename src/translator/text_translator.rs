@@ -10,9 +10,9 @@ impl TextTranslator {
 
 impl TextTranslator {
     pub fn translate(&self, inp: &str) -> String {
-        self.translate_from_chars(inp.chars())
+        Self::translate_from_chars(inp.chars())
     }
-    pub fn translate_from_chars(&self, inp: str::Chars) -> String {
+    pub fn translate_from_chars(inp: str::Chars) -> String {
         inp.map(|c| match c {
             '²' => 'Ա',
             '³' => 'ա',

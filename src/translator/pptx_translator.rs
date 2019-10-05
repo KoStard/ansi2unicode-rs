@@ -35,7 +35,7 @@ impl<'a> PPTXTranslator<'a> {
                     let options =
                         zip::write::FileOptions::default().compression_method(file.compression());
                     output_archive.start_file(file.name(), options)?;
-                    output_archive.write(converted.as_bytes())?;
+                    output_archive.write_all(converted.as_bytes())?;
                 }
                 _ => {
                     let mut buffer = Vec::with_capacity(file.size() as usize);
@@ -44,7 +44,7 @@ impl<'a> PPTXTranslator<'a> {
                     let options =
                         zip::write::FileOptions::default().compression_method(file.compression());
                     output_archive.start_file(file.name(), options)?;
-                    output_archive.write(&buffer)?;
+                    output_archive.write_all(&buffer)?;
                 }
             }
         }
