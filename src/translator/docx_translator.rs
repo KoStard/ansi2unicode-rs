@@ -1,7 +1,7 @@
 use super::text_translator::TextTranslator;
 use std::fs::File;
 use std::io;
-use std::io::{Cursor, Read, Write, Seek};
+use std::io::{Cursor, Read, Seek, Write};
 use std::path::{Path, PathBuf};
 use zip::{ZipArchive, ZipWriter};
 
@@ -62,7 +62,7 @@ impl<'a> DocXTranslator<'a> {
 
         Ok(())
     }
-    pub fn from_stream<R: io::Read+io::Seek>(reader: &mut R) -> io::Result<Vec<u8>> {
+    pub fn from_stream<R: io::Read + io::Seek>(reader: &mut R) -> io::Result<Vec<u8>> {
         let mut archive = ZipArchive::new(reader)?;
         let mut mem = Cursor::new(Vec::new());
         {
@@ -81,12 +81,15 @@ impl<'a> DocXTranslator<'a> {
 mod text_translation_tests {
     use super::DocXTranslator;
     use super::File;
-    use std::io::{Read, Cursor};
+    use std::io::{Cursor, Read};
 
     // Test with your files
-   #[test]
-   fn test_docx() {
-       let t = DocXTranslator::new("/Users/rubenkostandyan/Downloads/Pulmanology1-converted.docx", "/Users/rubenkostandyan/Downloads/Pulmanology1-converted-translated.docx");
-       assert!(t.translate().is_ok());
-   }
+    #[test]
+    fn test_docx() {
+        let t = DocXTranslator::new(
+            "/Users/rubenkostandyan/Downloads/Pulmanology1-converted.docx",
+            "/Users/rubenkostandyan/Downloads/Pulmanology1-converted-translated.docx",
+        );
+        assert!(t.translate().is_ok());
+    }
 }
