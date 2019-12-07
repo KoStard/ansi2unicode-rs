@@ -1,5 +1,5 @@
 # ansi2unicode-rs
-Rust Library for converting ANSI text or files to Unicode.
+Rust Library for converting Armenian ANSI text or files to Unicode.
 - [x] Convert strings directly
 - [x] Convert txt files
 - [x] Convert docx files
